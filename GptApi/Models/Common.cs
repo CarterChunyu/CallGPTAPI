@@ -29,4 +29,9 @@ namespace GptApi.Models
         public bool? IsComplete { get; set; }
         public string? Body { get; set; }
     }
+
+    public class RemoveDictionaryResponse: CommonResponse
+    {
+
+    }
 }

@@ -4,9 +4,9 @@
     {
         public string? Question { get; set; }
 
-        public string? DesKey { get; set; }
+        //public string? DesKey { get; set; }
 
-        public string? DesIV { get; set; }
+        //public string? DesIV { get; set; }
     }
 
     public class GetMessageRequest
