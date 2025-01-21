@@ -34,4 +34,9 @@ namespace GptApi.Models
     {
 
     }
+
+    public class TokenCommonReponse():CommonResponse
+    {
+        public string? Token { get; set; }
+    }
 }

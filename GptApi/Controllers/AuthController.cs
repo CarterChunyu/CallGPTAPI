@@ -19,15 +19,37 @@ namespace GptApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> GetToken(User userinfo)
+        public async Task<TokenCommonReponse?> GetToken(User userinfo)
         {
-            var User = await _context.Users.FirstOrDefaultAsync
-                (x => x.UserName == userinfo.UserName && x.UserPwd == userinfo.UserPwd);
-            if (User == null)
-                return BadRequest("帳號或密碼錯誤");
-            var role = User.Cnt <= 2000 ? "GptTester" : "Customer";
+            User? user = null;
+            TokenCommonReponse? response = null;
+            int cnt = 0;
+            while (cnt < 2 && user == null)
+            {
+                try
+                {
+                    user = await GetUser(userinfo);
+                    cnt = 2;
+                    response = new TokenCommonReponse() { StatusCode = 400, Message = "帳號密碼錯誤" };
+                }
+                catch (Exception ex)
+                {
+                    cnt++;
+                    var msg = ex.InnerException == null ? ex.Message : ex.InnerException.Message;
+                    response = new TokenCommonReponse() { StatusCode = 403, Message = msg };
+                }
+            }
+            if (user == null)
+                return response;
+            var role = user?.Cnt <= 2000 ? "GptTester" : "Customer";
             var token = JwtHelper.GenerateJsonWebToken(userinfo, role);
-            return Ok(token);
+            return new TokenCommonReponse { StatusCode = 200, Message ="success", Token = token };
+        }
+
+
+        private async Task<User?> GetUser(User userinfo)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.UserName == userinfo.UserName && x.UserPwd == userinfo.UserPwd);
         }
     }
 }
